@@ -10,26 +10,41 @@ namespace LinqFirstLab
     {
         Database database = new Database();
 
+        /// <summary>
+        /// The method aims to group employees based on their department ID.
+        /// It uses groupby to group the employee collection by the DepartmentId property. 
+        /// </summary>
         public void GroupEmployeeByDepartment()
         {
+            Console.Clear();
             var groupOfEmployee = database.EmployeeCollection.GroupBy(x => x.DepartmentId);
 
-            foreach(var group in groupOfEmployee )
+            Console.WriteLine();
+            foreach (var group in groupOfEmployee )
             {
-                Console.WriteLine();
 
                 Console.WriteLine($"Department Id : {group.Key}");
 
-                foreach( var employee in group )
+                foreach ( var employee in group )
                 {
                     Console.WriteLine($"Employee Id: {employee.EmployeeId}, " +
                                       $"Employee Name: {employee.EmployeeFirstName} {employee.EmployeeLastName}");
                 }
+                Console.WriteLine();
             }
+
         }
 
+
+        /// <summary>
+        /// This method checks employee salary by their department. It displays the average salary for 
+        /// each department, along with the department's highest total salary. It uses Sum and Average to 
+        /// compute the total and average salary, respectively, for each department.
+        /// </summary>
         public void CalculateSalaryOfDepartments()
         {
+            Console.Clear();
+
             var departmentSalary = database.EmployeeCollection
                                 .GroupBy(x => x.DepartmentId)
                                 .Select(department => new
@@ -39,6 +54,7 @@ namespace LinqFirstLab
                                     AverageSalary = department.Average(e => e.Salary)
                                 });
 
+            Console.WriteLine();
             foreach( var emp in departmentSalary)
             {
                 Console.WriteLine($"Average Salary of Department {emp.DepartmentId}: $ {emp.AverageSalary:F2}");
@@ -53,8 +69,14 @@ namespace LinqFirstLab
 
         }
 
+        /// <summary>
+        /// This method organize employees based on the projects they are involved in. 
+        /// This performs a group join between the ProjectList and EmployeeCollection based on the common department ID.
+        /// </summary>
         public void GroupEmployeeByProjects()
         {
+            Console.Clear();
+
             var employeeGroup = database.ProjectList
                                 .GroupJoin(database.EmployeeCollection,
                                  project => project.DepartmentId,
@@ -72,8 +94,10 @@ namespace LinqFirstLab
 
                                  });
 
+            Console.WriteLine();
             foreach (var project in employeeGroup)
             {
+
                 Console.WriteLine($"Project Id: {project.projectId}, Project Name: {project.projectName}");
 
                 foreach (var employee in project.employees)
@@ -84,8 +108,15 @@ namespace LinqFirstLab
             }
         }
 
+
+        /// <summary>
+        /// This method group the ProjectList by the DepartmentId. Then, it calculates the total number of 
+        /// projects in each department
+        /// </summary>
         public void ProjectsByDepartments()
         {
+            Console.Clear();
+
             var projectsCount = database.ProjectList
                 .GroupBy(project => project.DepartmentId)
                 .Select(department => new
@@ -94,14 +125,28 @@ namespace LinqFirstLab
                     TotalProjects = department.Count()
                 });
 
+            Console.WriteLine();
+
             foreach (var result in projectsCount)
             {
+                Console.WriteLine();
                 Console.WriteLine($"Department Id: {result.DepartmentId}, Total Projects: {result.TotalProjects}");
             }
         }
 
+
+        /// <summary>
+        /// This display information about employees, including their department, salary, and associated projects.
+        /// It performs a group join between the DepartmentList and EmployeeCollection based on the common department ID. 
+        /// Then, it then performs another group join with the ProjectList to include details about the projects 
+        /// associated with each department. The method iterates through the results and prints the department ID, name, 
+        /// and details of each employee, including their ID, full name, salary, and a list of associated projects with 
+        /// their IDs and names.
+        /// </summary>
         public void DisplayCompleteInfo()
         {
+            Console.Clear();
+
             var employeeDetails = database.DepartmentList
                                   .GroupJoin(database.EmployeeCollection,
                                    department => department.DepartmentId,
@@ -132,8 +177,11 @@ namespace LinqFirstLab
                                         }).Distinct()
                                     });
 
+            Console.WriteLine();
+
             foreach (var info in employeeDetails)
             {
+
                 Console.WriteLine($"Department Id: {info.department.departmentId}, Department Name: {info.department.departmentName}");
 
                 foreach (var employee in info.department.employees)
@@ -148,10 +196,19 @@ namespace LinqFirstLab
             }
         }
 
+
+        /// <summary>
+        /// This method filters employees based on a specified salary threshold, and then displays 
+        /// the employees who have salaries exceeding the given threshold. 
+        /// </summary>
+        /// <param name="Salary"></param>
         public void CheckEmployeeSalary(double Salary)
         {
+            Console.Clear();
             var salary = database.EmployeeCollection.Where(x => x.Salary > Salary);
-                                       
+
+            Console.WriteLine();
+
             Console.WriteLine($"The employee that have salary above the ${Salary}: ");
             foreach (var obj in salary)
             {
@@ -159,8 +216,16 @@ namespace LinqFirstLab
             }
         }
 
+        /// <summary>
+        /// This method joins the EmployeeCollection and ProjectList based on their shared DepartmentId.
+        /// The results are grouped by the key of an employee's first and last name. For each group, 
+        /// the method selects and formats relevant information, such as the employee's full name and 
+        /// a concise list of project names they are associated with. 
+        /// </summary>
         public void DisplaySpecificInfo()
         {
+            Console.Clear();
+
             var employeeProjectDetails = database.EmployeeCollection
                 .Join(database.ProjectList,
                     employee => employee.DepartmentId,
@@ -179,6 +244,7 @@ namespace LinqFirstLab
                     ProjectNames = string.Join(", ", group.Select(details => details.projectName))
                 });
 
+            Console.WriteLine();
             foreach (var details in employeeProjectDetails)
             {
                 Console.WriteLine($"Name: {details.FirstName} {details.LastName}, Projects: {details.ProjectNames}");
